@@ -87,6 +87,17 @@ app.get("/health", async (request, response) => {
 // ML API Routes
 app.use("/api/ml", mlRouter);
 
+// ============= 404 HANDLER =============
+
+app.use((req, res) => {
+  console.warn(`⚠️  404: ${req.method} ${req.path}`);
+  res.status(404).json({ 
+    error: "Route not found",
+    path: req.path,
+    method: req.method
+  });
+});
+
 // ============= ERROR HANDLING =============
 
 app.use((err, req, res, next) => {
@@ -145,9 +156,12 @@ async function startServer() {
   }
 }
 
-// Start server if this file is run directly
+// Start server if this file is run directly (local / Render)
 if (require.main === module) {
   startServer();
+} else {
+  // Serverless environment (Vercel)
+  initializeApp(); // ensure DB connects
 }
 
-module.exports = { app, server, io };
+module.exports = app;
