@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="app-body">
+    <div class="toast-stack" id="toastPlayer"></div>
+
+    <main class="app-shell player-shell">
+      <section class="stage-column">
+        <div class="topbar">
+          <div>
+            <div class="eyebrow">Player Console</div>
+            <h1 class="page-title" id="playerTitle"><%= playerName || "Player" %></h1>
+          </div>
+          <div class="pill-row">
+            <span class="ghost-pill">Room <span id="playerRoomCode"><%= roomCode || "-----" %></span></span>
+            <span class="ghost-pill" id="playerStatus">Joining...</span>
+          </div>
+        </div>
+
+        <article class="stage-card question-card">
+          <div class="question-header">
+            <div>
+              <div class="card-kicker" id="playerQuestionLabel">Connecting to room</div>
+              <h2 id="playerQuestionPrompt">Wait for the teacher to start the quiz.</h2>
+            </div>
+            <div class="timer-ring" id="playerTimerRing" style="--progress: 0%">
+              <div class="timer-value" id="playerTimerValue">15</div>
+            </div>
+          </div>
+
+          <div class="answer-grid" id="playerAnswerGrid">
+            <div class="answer-tile placeholder">Your answer choices will appear here.</div>
+          </div>
+
+          <div class="player-feedback" id="playerFeedback">
+            Join the room from the landing page, then wait for the host to start.
+          </div>
+        </article>
+
+        <article class="stage-card hidden" id="playerFinalCard">
+          <div class="card-kicker">Final Result</div>
+          <h2 id="playerFinalTitle">Quiz complete</h2>
+          <div class="podium-grid" id="playerPodium"></div>
+        </article>
+      </section>
+
+      <aside class="sidebar-column">
+        <article class="side-card">
+          <div class="sidebar-header">
+            <div>
+              <div class="card-kicker">Your Position</div>
+              <h2>Current Rank</h2>
+            </div>
+            <span class="badge-number" id="playerRank">-</span>
+          </div>
+          <div class="stat-banner" id="scoreBanner">Waiting for leaderboard...</div>
+        </article>
+
+        <article class="side-card">
+          <div class="sidebar-header">
+            <div>
+              <div class="card-kicker">Leaderboard</div>
+              <h2>Live Scores</h2>
+            </div>
+          </div>
+          <div class="leaderboard-list" id="playerLeaderboard"></div>
+        </article>
+      </aside>
+    </main>
+
+    <script>
+      window.STUDY_BUDDY_BOOTSTRAP = {
+        roomCode: "<%= roomCode %>",
+        playerName: "<%= playerName %>",
+      };
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/shared.js"></script>
+    <script src="/js/player.js"></script>
+  </body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="app-body display-body">
+    <div class="toast-stack" id="toastDisplay"></div>
+
+    <main class="app-shell display-shell">
+      <section class="stage-column">
+        <div class="topbar">
+          <div>
+            <div class="eyebrow">Classroom Display</div>
+            <h1 class="page-title">Study-Buddy Live Board</h1>
+          </div>
+          <div class="pill-row">
+            <span class="ghost-pill">Room <span id="displayRoomCode"><%= roomCode || "-----" %></span></span>
+            <span class="ghost-pill" id="displayStatus">Connecting...</span>
+          </div>
+        </div>
+
+        <article class="stage-card question-card display-stage">
+          <div class="question-header">
+            <div>
+              <div class="card-kicker" id="displayQuestionLabel">Waiting for room</div>
+              <h2 id="displayQuestionPrompt">Open this page from the host console after the room is created.</h2>
+            </div>
+            <div class="timer-ring display-timer" id="displayTimerRing" style="--progress: 0%">
+              <div class="timer-value" id="displayTimerValue">15</div>
+            </div>
+          </div>
+          <div class="answer-grid" id="displayAnswerGrid">
+            <div class="answer-tile placeholder">The live classroom question will appear here.</div>
+          </div>
+        </article>
+
+        <article class="stage-card result-card hidden" id="displayResultCard">
+          <div class="card-kicker">Round Breakdown</div>
+          <h2 id="displayResultTitle">Leaderboard update</h2>
+          <p class="result-highlight" id="displayResultAnswer">Wait for the first result reveal.</p>
+          <div class="stats-grid" id="displayResultStats"></div>
+        </article>
+
+        <article class="stage-card hidden" id="displayFinalCard">
+          <div class="card-kicker">Final Podium</div>
+          <h2 id="displayFinalTitle">Quiz complete</h2>
+          <div class="podium-grid" id="displayPodium"></div>
+        </article>
+      </section>
+
+      <aside class="sidebar-column">
+        <article class="side-card">
+          <div class="sidebar-header">
+            <div>
+              <div class="card-kicker">Room Summary</div>
+              <h2>Live Standings</h2>
+            </div>
+            <span class="badge-number" id="displayPlayerCount">0</span>
+          </div>
+          <div class="stat-banner" id="displayPackInfo">Waiting for room state...</div>
+          <div class="leaderboard-list" id="displayLeaderboard"></div>
+        </article>
+      </aside>
+    </main>
+
+    <script>
+      window.STUDY_BUDDY_DISPLAY = {
+        roomCode: "<%= roomCode %>",
+      };
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/shared.js"></script>
+    <script src="/js/display.js"></script>
+  </body>
+</html>

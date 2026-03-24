@@ -1,0 +1,65 @@
+{
+  "title": "India GK Basics",
+  "questions": [
+    {
+      "prompt": "What is the capital of India?",
+      "choices": ["Mumbai", "New Delhi", "Kolkata", "Chennai"],
+      "answerIndex": 1,
+      "theme": "india"
+    },
+    {
+      "prompt": "Who is known as the Father of the Nation in India?",
+      "choices": ["Bhagat Singh", "Subhas Chandra Bose", "Mahatma Gandhi", "Jawaharlal Nehru"],
+      "answerIndex": 2,
+      "theme": "india"
+    },
+    {
+      "prompt": "Which is the national animal of India?",
+      "choices": ["Lion", "Tiger", "Elephant", "Leopard"],
+      "answerIndex": 1,
+      "theme": "india"
+    },
+    {
+      "prompt": "Which is the national bird of India?",
+      "choices": ["Parrot", "Peacock", "Sparrow", "Eagle"],
+      "answerIndex": 1,
+      "theme": "india"
+    },
+    {
+      "prompt": "How many states does India have?",
+      "choices": ["26", "28", "29", "30"],
+      "answerIndex": 1,
+      "theme": "india"
+    },
+    {
+      "prompt": "Which is the largest state in India by area?",
+      "choices": ["Madhya Pradesh", "Maharashtra", "Rajasthan", "Uttar Pradesh"],
+      "answerIndex": 2,
+      "theme": "india"
+    },
+    {
+      "prompt": "Which is the longest river in India?",
+      "choices": ["Yamuna", "Godavari", "Brahmaputra", "Ganga"],
+      "answerIndex": 3,
+      "theme": "india"
+    },
+    {
+      "prompt": "What is the national flower of India?",
+      "choices": ["Rose", "Lotus", "Sunflower", "Jasmine"],
+      "answerIndex": 1,
+      "theme": "india"
+    },
+    {
+      "prompt": "Who wrote the Indian national anthem, 'Jana Gana Mana'?",
+      "choices": ["Rabindranath Tagore", "Bankim Chandra Chattopadhyay", "Sarojini Naidu", "Muhammad Iqbal"],
+      "answerIndex": 0,
+      "theme": "india"
+    },
+    {
+      "prompt": "Which monument is located in Agra?",
+      "choices": ["Qutub Minar", "India Gate", "Taj Mahal", "Charminar"],
+      "answerIndex": 2,
+      "theme": "india"
+    }
+  ]
+}

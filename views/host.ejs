@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="app-body">
+    <div class="toast-stack" id="toastHost"></div>
+
+    <main class="app-shell">
+      <section class="stage-column">
+        <div class="topbar">
+          <div>
+            <div class="eyebrow">Host Console</div>
+            <h1 class="page-title">Study-Buddy Command Deck</h1>
+          </div>
+          <div class="pill-row">
+            <span class="ghost-pill" id="connectionLabel">Connecting...</span>
+            <span class="ghost-pill" id="hostStatus">Lobby</span>
+          </div>
+        </div>
+
+        <article class="stage-card code-card">
+          <div>
+            <div class="card-kicker">Room Code</div>
+            <div class="room-code" id="roomCode">-----</div>
+            <p class="muted-copy">Create a room, let students join, then start the quiz.</p>
+            <a class="display-link" id="displayLink" href="/display" target="_blank">
+              Open Classroom Display
+            </a>
+          </div>
+          <div class="button-column">
+            <button class="action-button" id="primaryAction">Create Room</button>
+          </div>
+        </article>
+
+        <article class="stage-card question-card">
+          <div class="question-header">
+            <div>
+              <div class="card-kicker" id="questionLabel">Waiting for room</div>
+              <h2 id="questionPrompt">Build the lobby first, then launch the first question.</h2>
+            </div>
+            <div class="timer-ring" id="timerRing" style="--progress: 0%">
+              <div class="timer-value" id="timerValue">15</div>
+            </div>
+          </div>
+
+          <div class="answer-grid" id="answerGrid">
+            <div class="answer-tile placeholder">Live answer choices will appear here.</div>
+          </div>
+        </article>
+
+        <article class="stage-card result-card hidden" id="resultCard">
+          <div class="card-kicker">Round Reveal</div>
+          <h2 id="resultTitle">Correct answer</h2>
+          <p class="result-highlight" id="resultAnswer">Waiting for results...</p>
+          <div class="stats-grid" id="resultStats"></div>
+        </article>
+
+        <article class="stage-card hidden" id="finalCard">
+          <div class="card-kicker">Champion Podium</div>
+          <h2>Final Standings</h2>
+          <div class="podium-grid" id="podium"></div>
+        </article>
+      </section>
+
+      <aside class="sidebar-column">
+        <article class="side-card">
+          <div class="sidebar-header">
+            <div>
+              <div class="card-kicker">Live Roster</div>
+              <h2>Players in Room</h2>
+            </div>
+            <span class="badge-number" id="playerCount">0</span>
+          </div>
+          <div class="leaderboard-list" id="joinedPlayers"></div>
+        </article>
+
+        <article class="side-card">
+          <div class="sidebar-header">
+            <div>
+              <div class="card-kicker">Leaderboard</div>
+              <h2>Rank Movement</h2>
+            </div>
+          </div>
+          <div class="leaderboard-list" id="leaderboard"></div>
+        </article>
+
+        <article class="side-card">
+          <div class="sidebar-header">
+            <div>
+              <div class="card-kicker">Question Pack</div>
+              <h2>Custom Quiz Loader</h2>
+            </div>
+          </div>
+          <p class="muted-copy" id="questionPackStatus">
+            Using the demo question pack.
+          </p>
+          <div class="config-actions">
+            <a class="ghost-link" href="/data/sample-question-pack.json" target="_blank">
+              Sample JSON
+            </a>
+            <button class="secondary-button" id="loadExamplePack" type="button">
+              Load Example
+            </button>
+            <button class="secondary-button" id="loadIndiaGkPack" type="button">
+              Load India GK
+            </button>
+          </div>
+          <label class="field">
+            <span>Import JSON File</span>
+            <input id="questionPackFile" type="file" accept=".json,application/json" />
+          </label>
+          <label class="field">
+            <span>Question Pack Editor</span>
+            <textarea
+              id="questionPackEditor"
+              class="config-editor"
+              spellcheck="false"
+              placeholder='{"title":"Science Blitz","questions":[{"prompt":"...","choices":["A","B","C","D"],"answerIndex":1}]}'
+            ></textarea>
+          </label>
+          <div class="config-actions">
+            <button class="secondary-button" id="applyQuestionPack" type="button">
+              Apply Custom Pack
+            </button>
+            <button class="secondary-button" id="resetQuestionPack" type="button">
+              Reset Demo Pack
+            </button>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/shared.js"></script>
+    <script src="/js/host.js"></script>
+  </body>
+</html>

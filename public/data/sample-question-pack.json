@@ -1,0 +1,35 @@
+{
+  "title": "Science and Logic Sprint",
+  "questions": [
+    {
+      "prompt": "Which organ pumps blood through the human body?",
+      "choices": ["Liver", "Heart", "Lung", "Kidney"],
+      "answerIndex": 1,
+      "theme": "science"
+    },
+    {
+      "prompt": "What is the binary value of decimal 5?",
+      "choices": ["101", "110", "111", "100"],
+      "answerIndex": 0,
+      "theme": "logic"
+    },
+    {
+      "prompt": "Which planet has the most visible rings?",
+      "choices": ["Mercury", "Mars", "Saturn", "Neptune"],
+      "answerIndex": 2,
+      "theme": "space"
+    },
+    {
+      "prompt": "Which keyword is used to declare a constant in JavaScript?",
+      "choices": ["let", "const", "static", "fixed"],
+      "answerIndex": 1,
+      "theme": "code"
+    },
+    {
+      "prompt": "How many degrees are in a right angle?",
+      "choices": ["45", "60", "90", "180"],
+      "answerIndex": 2,
+      "theme": "math"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="landing-body">
+    <main class="landing-shell">
+      <section class="hero-card">
+        <div class="hero-copy">
+          <div class="eyebrow">Study-Buddy Live Arena</div>
+          <h1>Run a classroom quiz like a live game show.</h1>
+          <p class="hero-text">
+            Teachers launch a room, students join with a code, and every
+            question lands on every screen at the same second through Socket.io.
+          </p>
+          <div class="hero-actions">
+            <a class="action-button" href="/host">Open Host Console</a>
+            <span class="ghost-pill">Real-time leaderboard</span>
+            <span class="ghost-pill">15 second rounds</span>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="pulse-orb"></div>
+          <div class="score-panel">
+            <div class="score-headline">Instant Rank Swaps</div>
+            <div class="mock-leaderboard">
+              <div class="mock-row top"><span>1</span><strong>Aarav</strong><em>420</em></div>
+              <div class="mock-row"><span>2</span><strong>Niya</strong><em>395</em></div>
+              <div class="mock-row"><span>3</span><strong>Ravi</strong><em>380</em></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="landing-grid">
+        <article class="info-card">
+          <div class="card-kicker">How it works</div>
+          <h2>One host. Many players. Zero refreshes.</h2>
+          <ul class="feature-list">
+            <li>Teacher creates a room and shares a short code.</li>
+            <li>Students join from mobile or laptop in seconds.</li>
+            <li>Server pushes each question live to every screen.</li>
+            <li>Leaderboard updates instantly after each round.</li>
+          </ul>
+        </article>
+
+        <article class="join-card">
+          <div class="card-kicker">Join a room</div>
+          <h2>Enter the arena</h2>
+          <form class="join-form" action="/player" method="get">
+            <label class="field">
+              <span>Room Code</span>
+              <input
+                type="text"
+                name="room"
+                placeholder="AB12C"
+                maxlength="5"
+                required
+              />
+            </label>
+            <label class="field">
+              <span>Your Name</span>
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your display name"
+                maxlength="20"
+                required
+              />
+            </label>
+            <button class="action-button full-width" type="submit">
+              Join Quiz Room
+            </button>
+          </form>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

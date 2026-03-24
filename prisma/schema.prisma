@@ -1,0 +1,214 @@
+// This is the Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============= ROOM MODEL =============
+model Room {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  teacherId String
+  status    String   @default("waiting") // waiting, active, completed
+  maxPlayers Int     @default(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  students     Student[]
+  sessions     QuizSession[]
+  answerRecords AnswerRecord[]
+  leaderboard  Leaderboard?
+  questions    RoomQuestion[]
+
+  @@index([code])
+  @@index([teacherId])
+}
+
+// ============= STUDENT MODEL =============
+model Student {
+  id               String   @id @default(cuid())
+  name             String
+  roomId           String
+  roomCode         String
+  joinedAt         DateTime @default(now())
+  accuracy         Float    @default(0)
+  skillLevel       String   @default("beginner") // beginner, intermediate, advanced
+  badges           String[] @default([])
+  totalQuestionsAnswered Int @default(0)
+  lastActive       DateTime @default(now())
+
+  // Relations
+  room              Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  answerRecords     AnswerRecord[]
+  performance       Performance?
+  difficultyProgression DifficultyProgression?
+  leaderboardEntries LeaderboardEntry[]
+
+  @@index([roomId])
+  @@index([roomCode])
+}
+
+// ============= ANSWER RECORD MODEL =============
+model AnswerRecord {
+  id         String   @id @default(cuid())
+  studentId  String
+  roomId     String
+  roomCode   String
+  questionId String
+  selected   String
+  correct    Boolean
+  timeSpent  Int      // seconds
+  category   String
+  difficulty Int      @default(1) // 1-5
+  submittedAt DateTime @default(now())
+
+  // Relations
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  room       Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([roomId])
+  @@index([submittedAt])
+  @@index([roomId, submittedAt])
+}
+
+// ============= QUIZ SESSION MODEL =============
+model QuizSession {
+  id             String   @id @default(cuid())
+  roomId         String
+  roomCode       String
+  teacherId      String
+  startTime      DateTime @default(now())
+  endTime        DateTime?
+  status         String   @default("active") // active, completed
+  totalQuestions Int
+  totalStudents  Int      @default(0)
+  avgScore       Float    @default(0)
+
+  // Relations
+  room           Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([roomCode])
+}
+
+// ============= PERFORMANCE MODEL =============
+model Performance {
+  id               String   @id @default(cuid())
+  studentId        String   @unique
+  overallAccuracy  Float    @default(0)
+  totalAnswered    Int      @default(0)
+  correctAnswers   Int      @default(0)
+  weakAreas        String[] @default([])
+  learningCurve    String   @default("stable") // improving, stable, declining
+  trendInLastSessions Float[] @default([])
+  lastUpdated      DateTime @default(now())
+
+  // Relations
+  student          Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+}
+
+// ============= DIFFICULTY PROGRESSION MODEL =============
+model DifficultyProgression {
+  id                    String   @id @default(cuid())
+  studentId             String   @unique
+  currentLevel          Int      @default(1)
+  previousLevel         Int      @default(1)
+  attemptsSinceAdjustment Int    @default(0)
+  nextReviewDue         DateTime?
+  adjustmentHistory     Json     @default("[]") // Array of {level, reason, timestamp}
+  lastUpdated           DateTime @default(now())
+
+  // Relations
+  student               Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+}
+
+// ============= QUESTION MODEL =============
+model Question {
+  id              String   @id @default(cuid())
+  text            String   @db.Text
+  options         String[] // Array of option strings
+  correctAnswer   Int      // Index of correct option
+  category        String
+  difficulty      Int      @default(1) // 1-5
+  explanation     String   @db.Text
+  tags            String[] @default([])
+  usageCount      Int      @default(0)
+  avgTimeSpent    Float    @default(0)
+  avgAccuracy     Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  roomQuestions   RoomQuestion[]
+
+  @@index([category])
+  @@index([difficulty])
+  @@index([createdAt])
+}
+
+// ============= ROOM-QUESTION JUNCTION MODEL =============
+model RoomQuestion {
+  id         String   @id @default(cuid())
+  roomId     String
+  questionId String
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  // Relations
+  room       Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, questionId])
+  @@index([roomId])
+}
+
+// ============= LEADERBOARD MODEL =============
+model Leaderboard {
+  id        String   @id @default(cuid())
+  roomId    String   @unique
+  roomCode  String
+  createdAt DateTime @default(now())
+  expiresAt DateTime // 24 hours from creation
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  entries   LeaderboardEntry[]
+
+  @@index([roomId])
+  @@index([expiresAt])
+}
+
+// ============= LEADERBOARD ENTRY MODEL =============
+model LeaderboardEntry {
+  id             String   @id @default(cuid())
+  leaderboardId  String
+  studentId      String
+  studentName    String
+  score          Int
+  accuracy       Float    @default(0)
+  questionsAnswered Int   @default(0)
+  rank           Int      @default(0)
+  timestamp      DateTime @default(now())
+
+  // Relations
+  leaderboard    Leaderboard @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
+  student        Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([leaderboardId])
+  @@index([studentId])
+  @@index([score])
+}
