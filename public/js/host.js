@@ -34,6 +34,7 @@ const elements = {
   resetQuestionPack: document.getElementById("resetQuestionPack"),
   loadExamplePack: document.getElementById("loadExamplePack"),
   loadIndiaGkPack: document.getElementById("loadIndiaGkPack"),
+  loadDbPack: document.getElementById("loadDbPack"),
 };
 
 function parseQuestionPackDraft() {
@@ -63,6 +64,25 @@ async function loadIndiaGkPack() {
 
   const payload = await response.text();
   elements.questionPackEditor.value = payload;
+}
+
+async function loadDbPack() {
+  const response = await fetch("/api/questions?limit=20");
+  if (!response.ok) {
+    throw new Error("Could not load questions from database.");
+  }
+
+  const { data } = await response.json();
+  const pack = {
+    title: "MongoDB Seeded Questions",
+    questions: data.map(q => ({
+      prompt: q.prompt,
+      choices: q.choices.map(c => c.text),
+      answerIndex: q.answerIndex
+    }))
+  };
+
+  elements.questionPackEditor.value = JSON.stringify(pack, null, 2);
 }
 
 function updateQuestionPackStatus(roomState) {
@@ -187,6 +207,15 @@ elements.loadIndiaGkPack.addEventListener("click", async () => {
   try {
     await loadIndiaGkPack();
     ui.showToast("toastHost", "India GK question pack loaded into the editor.", "success");
+  } catch (error) {
+    ui.showToast("toastHost", error.message, "error");
+  }
+});
+
+elements.loadDbPack.addEventListener("click", async () => {
+  try {
+    await loadDbPack();
+    ui.showToast("toastHost", "Database question pack loaded into the editor.", "success");
   } catch (error) {
     ui.showToast("toastHost", error.message, "error");
   }
