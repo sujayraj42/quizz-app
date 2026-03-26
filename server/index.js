@@ -1,8 +1,3 @@
-/**
- * Updated Server with MongoDB Integration
- * Connects to MongoDB on startup with fallback to memory mode
- */
-
 const path = require("node:path");
 const http = require("node:http");
 const express = require("express");
@@ -11,42 +6,44 @@ const { registerSocketHandlers } = require("./socket");
 const mlRouter = require("./ml/mlRouter");
 const { connectDB, isConnected } = require("./db/connection");
 const db = require("./db/database");
-require('dotenv').config();
+
+require("dotenv").config();
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.CORS_ORIGIN || "*",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+  },
+  transports: ["websocket", "polling"],
+  perMessageDeflate: false,
+  connectionStateRecovery: {
+    maxDisconnectionDuration: Number(process.env.RECONNECT_GRACE_MS || 60000),
+    skipMiddlewares: true,
+  },
+  pingInterval: Number(process.env.SOCKET_PING_INTERVAL || 25000),
+  pingTimeout: Number(process.env.SOCKET_PING_TIMEOUT || 20000),
 });
 const PORT = process.env.PORT || 3000;
 
-// ============= MIDDLEWARE =============
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "views"));
 app.use(express.static(path.join(__dirname, "..", "public")));
 
-// ============= DATABASE INITIALIZATION =============
-
 async function initializeApp() {
   try {
-    // Try to connect to MongoDB
-    await connectDB();
-    db.setUseMemory(false);
-    console.log('✅ Using MongoDB database');
+    const connection = await connectDB();
+    db.setUseMemory(!connection);
+    console.log(`Using ${connection ? "MongoDB" : "in-memory"} database`);
   } catch (error) {
-    console.error('⚠️  MongoDB connection failed, using in-memory storage:', error.message);
+    console.error("MongoDB connection failed, using in-memory storage:", error.message);
     db.setUseMemory(true);
   }
 }
-
-// ============= ROUTES =============
 
 app.get("/", (request, response) => {
   response.render("index", {
@@ -75,93 +72,66 @@ app.get("/display", (request, response) => {
   });
 });
 
-app.get("/health", async (request, response) => {
+app.get("/health", async (_request, response) => {
   const dbStatus = await db.healthCheck();
-  response.json({ 
+  response.json({
     ok: true,
     timestamp: new Date().toISOString(),
-    database: dbStatus
+    database: dbStatus,
   });
 });
 
-// ML API Routes
 app.use("/api/ml", mlRouter);
+app.use("/api", require("./apiRouter"));
 
-// ============= 404 HANDLER =============
-
-app.use((req, res) => {
-  console.warn(`⚠️  404: ${req.method} ${req.path}`);
-  res.status(404).json({ 
+app.use((request, response) => {
+  console.warn(`404: ${request.method} ${request.path}`);
+  response.status(404).json({
     error: "Route not found",
-    path: req.path,
-    method: req.method
+    path: request.path,
+    method: request.method,
   });
 });
 
-// ============= ERROR HANDLING =============
-
-app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.message);
-  res.status(500).json({ 
-    error: err.message,
-    environment: process.env.NODE_ENV 
+app.use((error, _request, response, _next) => {
+  console.error("Server error:", error.message);
+  response.status(500).json({
+    error: error.message,
+    environment: process.env.NODE_ENV,
   });
 });
-
-// ============= SOCKET.IO =============
 
 registerSocketHandlers(io);
 
-// ============= SERVER STARTUP =============
-
 async function startServer() {
   try {
-    // Initialize app (connect to DB)
     await initializeApp();
 
-    // Start server
     server.listen(PORT, () => {
-      console.log(`
-╔════════════════════════════════════════════╗
-║  📚 Study-Buddy Quiz Room                  ║
-╠════════════════════════════════════════════╣
-║  🌐 Server: http://localhost:${PORT}         
-║  📊 ML API: http://localhost:${PORT}/api/ml   
-║  🗄️  Database: ${isConnected() ? 'MongoDB ✅' : 'Memory ⚠️'}
-║  🔧 Mode: ${process.env.NODE_ENV || 'development'}
-╚════════════════════════════════════════════╝
-      `);
+      console.log(`Study-Buddy listening on http://localhost:${PORT}`);
+      console.log(`ML API available at http://localhost:${PORT}/api/ml`);
+      console.log(`Database mode: ${isConnected() ? "MongoDB" : "Memory"}`);
     });
 
-    // Graceful shutdown
-    process.on('SIGTERM', async () => {
-      console.log('📛 SIGTERM received, shutting down gracefully...');
+    const shutdown = async () => {
       server.close(async () => {
         await db.cleanup();
         process.exit(0);
       });
-    });
+    };
 
-    process.on('SIGINT', async () => {
-      console.log('📛 SIGINT received, shutting down gracefully...');
-      server.close(async () => {
-        await db.cleanup();
-        process.exit(0);
-      });
-    });
-
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
   } catch (error) {
-    console.error('❌ Failed to start server:', error.message);
+    console.error("Failed to start server:", error.message);
     process.exit(1);
   }
 }
 
-// Start server if this file is run directly (local / Render)
 if (require.main === module) {
   startServer();
 } else {
-  // Serverless environment (Vercel)
-  initializeApp(); // ensure DB connects
+  initializeApp();
 }
 
 module.exports = app;
